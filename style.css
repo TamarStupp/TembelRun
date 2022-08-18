@@ -40,7 +40,7 @@ body {
     background-size: 93% 100%;
     background-repeat: repeat-x;
     /* animation: bg-animation 2s infinite; */
-    transition: background-position 1s;
+    transition: background-position 0.01s;
 
 }
 
@@ -63,7 +63,7 @@ body {
     background-image: url("assets/media/road.svg");
     background-size: 93% 100%;
     background-repeat: repeat-x;
-    transition: background-position 1s;
+    /* transition: background-position 1s; */
     position: absolute;
     bottom: 5vh;
     z-index: -1;
@@ -91,7 +91,7 @@ body {
     bottom: 11.5vh;
     right: 0vw;
     width: 3vw;
-    transition: right 1s;
+    transition: right 0.1s;
 }
 
 .tall-obstacle {

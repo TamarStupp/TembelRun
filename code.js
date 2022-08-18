@@ -3,6 +3,7 @@ const MAX_DELAY = 1500;
 const BG_VELOCITY = 0.4 * 0.06 /* vw per ms */; 
 const ROAD_VELOCITY = 1.7 * 0.06;
 
+/* change obstacles animation */
 let start;
 let elapsed;
 let previousTimeStamp;
