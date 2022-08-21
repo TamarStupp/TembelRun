@@ -21,19 +21,35 @@ let obstacleTimeOut;
 let obstacleX;
 let newObstacle;
 let obstacleArray = [];
+let tembelClientRect;
+let obstacleClientRect;
+let collisions;
 
 // general
 let pauseDelay;
 
 window.addEventListener("load", () => {
-  startGame();
+  document.getElementById("start").addEventListener("click", startGame);
 });
 
-const startGame = () => {
+const startGame = (event) => {
+  event.stopPropagation();
+  if (document.getElementById("tembel")) {
+    done = false;
+    document.getElementById("end-message").classList.add("none");
+    document.getElementById("tembel").classList.remove("none");
+    document.getElementById("replay").removeEventListener("click", startGame);
+    document.querySelectorAll(".obstacle").forEach((el => {
+      el.remove();
+    }));
+  } else {
+    let tembel = El("img", {id: "tembel", attributes: {"src": "assets/media/tembel.png", "alt":"cat"}});
+    document.getElementById("body").appendChild(tembel);
+    document.getElementById("start-message").classList.add("none");
+    document.getElementById("start").removeEventListener("click", startGame);
+  }
   document.addEventListener("click", jump);
-  window.requestAnimationFrame(handleAnimations);
-  createObstacles();
-  document.getElementById("pause").addEventListener("click", pause);
+  continueGame(event);
     // pause the game when user changes tabs
     document.addEventListener("visibilitychange", event => {
       if (document.visibilityState !== "visible") {
@@ -44,15 +60,13 @@ const startGame = () => {
 }
 
 const jump = (event) => {
-  let animationTime = Number(getComputedStyle(document.documentElement).getPropertyValue('--jump-time').slice(0, -1)) * 1000 ;
-  if ((event.type === "keydown" && event.key === " ") || event.type === "click") {
+  let animationTime = 0.7 * 1000;
     document.removeEventListener("click", jump);
     document.getElementById("tembel").classList.add("jump");
     setTimeout(() => {
       document.addEventListener("click", jump);
       document.getElementById("tembel").classList.remove("jump");
     }, animationTime);
-  }
 }
 
 const initVariables = () => {
@@ -67,6 +81,7 @@ const handleAnimations = (timestamp) => {
     if (deltaT < 160) {
       animateBackground();
       animateObstacles()
+      checkCollision();
     }
   } else {
     clearTimeout(obstacleTimeOut);
@@ -74,27 +89,9 @@ const handleAnimations = (timestamp) => {
   previousTimeStamp = timestamp;
 }
 
-function animLoop( render ) {
-  var running, lastFrame = +new Date;
-  function loop( now ) {
-      // stop the loop if render returned false
-      if ( running !== false ) {
-          requestAnimationFrame( loop );
-          var elapsed1 = now - lastFrame;
-          // do not render frame when deltaT is too high
-          if ( elapsed1 < 160 ) {
-              running = render( elapsed1 );
-          }
-          lastFrame = now;
-      }
-  }
-  loop( lastFrame );
-}
-
 const continueGame = (event) => {
   event.stopPropagation();
   document.getElementById("pause-message").classList.add("none");
-  // document.addEventListener("click", jump);
   document.getElementById("resume").removeEventListener("click", continueGame);
   document.getElementById("quit").removeEventListener("click", endGame);
   document.addEventListener("click", jump);
@@ -130,17 +127,20 @@ const createObstacles = () => {
   newObstacle.classList.add("obstacle", obstacleType);
   newObstacle.style.right = "0vw";
   document.getElementById("body").prepend(newObstacle);
-  // setTimeout(createObstacles, Math.round(MAX_DELAY));
   obstacleTimeOut = setTimeout(createObstacles, Math.round(Math.random() * (MAX_DELAY - MIN_DELAY) + MIN_DELAY));
 }
 
 const animateObstacles = () => {
   obstacleArray = document.querySelectorAll(".obstacle");
-  obstacleArray.forEach((element) => {
-    obstacleX = Number(element.style.right.slice(0, -2));
-    obstacleX += ROAD_VELOCITY * deltaT;
-    element.style.right = `${obstacleX}vw`;
-  })
+  console.log(obstacleArray.length);
+    obstacleArray.forEach((element) => {
+      obstacleX = Number(element.style.right.slice(0, -2));
+      obstacleX += ROAD_VELOCITY * deltaT;
+      if (obstacleX > 100) {
+        element.remove();
+      }
+      element.style.right = `${obstacleX}vw`;
+    });
 };
 
 const pause = (event) => {
@@ -150,15 +150,39 @@ const pause = (event) => {
     document.getElementById("pause").removeEventListener("click", pause);
     done = true;
     document.getElementById("pause-message").classList.remove("none");
-    // document.querySelectorAll(".obstacle").forEach((el => {
-    //   el.remove();
-    // }));
     document.getElementById("resume").addEventListener("click", continueGame);
     document.getElementById("quit").addEventListener("click", endGame);
 }
 
-const endGame = () => {
 
+const checkCollision = () => {
+  tembelClientRect = document.getElementById("tembel").getBoundingClientRect();
+  document.querySelectorAll(".obstacle").forEach((elem, index) => {
+    obstacleClientRect = elem.getBoundingClientRect();
+    if (tembelClientRect.x < obstacleClientRect.x + obstacleClientRect.width &&
+      tembelClientRect.x + tembelClientRect.width > obstacleClientRect.x &&
+      tembelClientRect.y < obstacleClientRect.y + obstacleClientRect.height &&
+      tembelClientRect.height + tembelClientRect.y > obstacleClientRect.y) {
+        setTimeout (() => {
+          if (tembelClientRect.x < obstacleClientRect.x + obstacleClientRect.width &&
+            tembelClientRect.x + tembelClientRect.width > obstacleClientRect.x &&
+            tembelClientRect.y < obstacleClientRect.y + obstacleClientRect.height &&
+            tembelClientRect.height + tembelClientRect.y > obstacleClientRect.y) {
+              endGame();
+              console.log("one");
+              return;
+          }
+      }, 11)
+    }
+  });
+}
+
+const endGame = () => {
+  document.getElementById("pause").removeEventListener("click", pause);
+  done = true;
+  document.getElementById("end-message").classList.remove("none");
+  document.getElementById("tembel").classList.add("none");
+  document.getElementById("replay").addEventListener("click", startGame);
 }
 
 function El(tagName, options = {}, ...children) {
@@ -176,39 +200,4 @@ function El(tagName, options = {}, ...children) {
       el.setAttribute(attributeName, options.attributes[attributeName]);
   }
   return el;
-}
-
-
-
-
-
-
-
-
-function animLoop( render ) {
-  var running, lastFrame = +new Date;
-  function loop( now ) {
-      // stop the loop if render returned false
-      if ( running !== false ) {
-          requestAnimationFrame( loop );
-          var elapsed1 = now - lastFrame;
-          // do not render frame when deltaT is too high
-          if ( elapsed1 < 160 ) {
-              running = render( elapsed1 );
-          }
-          lastFrame = now;
-      }
-  }
-  loop( lastFrame );
-}
-
-// Usage
-// optional 2nd arg: elem containing the animation
-// animLoop(moveLeft);
-
-const moveLeft = (deltaT) => {
-  elem.style.left = ( left += 10 * deltaT / 16 ) + "px";
-  if ( left > 400 ) {
-    return false;
-  }
 }

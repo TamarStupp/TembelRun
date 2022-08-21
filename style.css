@@ -114,6 +114,15 @@ body {
     height: auto;
 }
 
+.open-text {
+    font-size: 2em;
+}
+
+#start-text {
+    padding: 5vh 5vw;
+    line-height: 3em;
+}
+
 .text {
     border-radius: 1em;
     background-color: #a59267;
@@ -134,11 +143,13 @@ body {
     background-color: #725326;
     border-radius: 0.5em;
     padding: 1vh 1vw;
+    color: white;
 }
 
 .title {
     font-size: 3em;
     font-weight: bold;
+    margin-bottom: 2vh;
 }
 
 .timer {
@@ -153,4 +164,40 @@ body {
     background-color: rgba(171, 171, 171, 0.582);
     border-radius: 50%;
     padding: 6vh 20vw;
+}
+
+#end-message {
+    /* display: flex; */
+    flex-direction: column;
+    align-items: center;
+}
+
+.end-pic {
+    width: 50%;
+    height: auto;
+
+}
+
+.replay {
+    display: block;
+    margin: 3vh auto;
+    font-size: 2em;
+    background-color: #725326;
+    border-radius: 0.5em;
+    padding: 1vh 1vw;
+    color: white;
+    width: 50%;
+}
+
+.end {
+    border-radius: 1em;
+    background-color: #a59267;
+    margin: auto;
+    width: 70%;
+    text-align: center;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 1vh 0 1vh; 
 }

@@ -10,13 +10,17 @@
         <script src="code.js"></script>
     </head>
     <body id="body">
-        <!-- <div id="start black-screen" class="message">
-            <p></p>
-            <button id="start">בואו נתחיל!</button>
-        </div> -->
+        <div id="start-message" class="black-screen">
+            <div class="text" id="start-text">
+                <div class="title">ברוכים הבאים למשחק של טמבל!</div>
+                <div class="open-text">אוי לא! שריקית התעצבנה על טמבל ועכשיו הוא צריך לברוח כמה שיותר מהר!</div>
+                <div class="open-text">עזרו לטמבל לקפוץ מעל המכשולים כדי ששריקית לא תתפוס אותו.</div>
+                <button id="start" class="btn">בואו נתחיל!</button>
+            </div>
+        </div>
         <img class="pause-btn" id="pause" src="assets/media/pause.svg" alt="pause button"/>
         <div id="road" class="road"></div>
-        <img id="tembel" src="assets/media/tembel.png" alt="cat"/>
+        <!-- <img id="tembel" src="assets/media/tembel.png" alt="cat"/> -->
         <div id="pause-message" class="black-screen none">
             <div class="text">
                 <div class="title">התעייפת?</div>
@@ -25,5 +29,12 @@
             </div>
         </div>
         <div id="timer" class="timer none">3</div>
+        <div id="end-message" class="black-screen none">
+            <div class="end">
+                <div class="title">אוי לא! שריקית תפסה אתכם!</div>
+                <img src="assets/media/sadTembel.jpg" alt="טמבל עצוב" class="end-pic"/>
+                <div class="replay" id="replay">ניסיון נוסף</div>
+            </div>
+        </div>
     </body>
 </html>
