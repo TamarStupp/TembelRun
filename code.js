@@ -3,75 +3,44 @@ const MAX_DELAY = 1500;
 const BG_VELOCITY = 0.4 * 0.06 /* vw per ms */; 
 const ROAD_VELOCITY = 1.7 * 0.06;
 
-/* change obstacles animation */
-let start;
-let elapsed;
-let previousTimeStamp;
-let BackgroundStartTime;
-let currBackgroundX;
-let currRoadX = 0;
+// genertal  animation
 let stopAnimations = false;
-let newObstacle;
-let typesOfObstacles = ["tall-obstacle", "short-obstacle"];
-let obstacleArray = [];
-let obstacleX;
+let deltaT;
+let previousTimeStamp;
 let done = false;
+
+// background animation
+let currBackgroundX = 0;
+let currRoadX = 0;
+
+// bstacle animation 
+let typesOfObstacles = ["tall-obstacle", "short-obstacle"];
 let obstacleTimeOut;
+
+// Variables that are in loops (refrain from creating too much variables)
+let obstacleX;
+let newObstacle;
+let obstacleArray = [];
+
+// general
+let pauseDelay;
 
 window.addEventListener("load", () => {
   startGame();
-  initVariables();
-  document.addEventListener("visibilitychange", event => {
-    if (document.visibilityState !== "visible") {
-      let stop = new Event("click");
-      document.getElementById("pause").dispatchEvent(stop);
-    }
-  });
 });
-
-const initVariables = () => {
-  currRoadX = 0;
-  currBackgroundX = 0;
-}
-
-const handleAnimations = (timestamp) => {
-  if (start === undefined) {
-    start = timestamp;
-  }
-  elapsed = timestamp - start;
-  animateBackground();
-  (animateObstacles = () => {
-    obstacleArray = document.querySelectorAll(".obstacle");
-    obstacleArray.forEach((element) => {
-      obstacleX = Number(element.style.right.slice(0, -2));
-      obstacleX += ROAD_VELOCITY * (timestamp - previousTimeStamp);
-      element.style.right = `${obstacleX}vw`;
-    });
-  })();
-    previousTimeStamp = timestamp;
-  if(!done) {
-      window.requestAnimationFrame(handleAnimations);
-    } else {
-      clearTimeout(obstacleTimeOut);
-    }
-}
 
 const startGame = () => {
   document.addEventListener("click", jump);
   window.requestAnimationFrame(handleAnimations);
   createObstacles();
   document.getElementById("pause").addEventListener("click", pause);
-}
-
-const continueGame = () => {
-  done = false;
-  document.getElementById("resume").removeEventListener("click", continueGame);
-  document.getElementById("quit").removeEventListener("click", endGame);
-  document.getElementById("pause-message").classList.add("none");
-  document.addEventListener("click", jump);
-  window.requestAnimationFrame(handleAnimations);
-  createObstacles();
-  document.getElementById("pause").addEventListener("click", pause);
+    // pause the game when user changes tabs
+    document.addEventListener("visibilitychange", event => {
+      if (document.visibilityState !== "visible") {
+        let stop = new Event("click");
+        document.getElementById("pause").dispatchEvent(stop);
+      }
+    });
 }
 
 const jump = (event) => {
@@ -86,10 +55,72 @@ const jump = (event) => {
   }
 }
 
+const initVariables = () => {
+  currRoadX = 0;
+  currBackgroundX = 0;
+}
+
+const handleAnimations = (timestamp) => {
+  if(!done) {
+    window.requestAnimationFrame(handleAnimations);
+    deltaT = timestamp - previousTimeStamp;
+    if (deltaT < 160) {
+      animateBackground();
+      animateObstacles()
+    }
+  } else {
+    clearTimeout(obstacleTimeOut);
+  }
+  previousTimeStamp = timestamp;
+}
+
+function animLoop( render ) {
+  var running, lastFrame = +new Date;
+  function loop( now ) {
+      // stop the loop if render returned false
+      if ( running !== false ) {
+          requestAnimationFrame( loop );
+          var elapsed1 = now - lastFrame;
+          // do not render frame when deltaT is too high
+          if ( elapsed1 < 160 ) {
+              running = render( elapsed1 );
+          }
+          lastFrame = now;
+      }
+  }
+  loop( lastFrame );
+}
+
+const continueGame = (event) => {
+  event.stopPropagation();
+  document.getElementById("pause-message").classList.add("none");
+  // document.addEventListener("click", jump);
+  document.getElementById("resume").removeEventListener("click", continueGame);
+  document.getElementById("quit").removeEventListener("click", endGame);
+  document.addEventListener("click", jump);
+  document.getElementById("timer").innerText = `3`;
+  document.getElementById("timer").classList.remove("none");
+  setTimeout(delayCounter, 1000, 2);
+}
+
+const delayCounter = (secondsLeft) => {
+  if (secondsLeft === 0) {
+    document.getElementById("timer").classList.add("none");
+    window.requestAnimationFrame(handleAnimations);
+    obstacleTimeOut = setTimeout(createObstacles, Math.round(Math.random() * (MAX_DELAY - MIN_DELAY) + MIN_DELAY));
+    done = false;
+    document.getElementById("pause").addEventListener("click", pause);
+  } else {
+    document.getElementById("timer").innerText = `${secondsLeft}`;
+    secondsLeft--;
+    setTimeout(delayCounter, 1000, secondsLeft);
+  }
+} 
+
 const animateBackground = () => {
-  currBackgroundX = - BG_VELOCITY * elapsed;
+  currBackgroundX -= BG_VELOCITY * deltaT;
   document.getElementById("body").style.backgroundPositionX = `${currBackgroundX}vw`;
-  currRoadX = -ROAD_VELOCITY * elapsed;
+  currRoadX -= ROAD_VELOCITY * deltaT;
   document.getElementById("road").style.backgroundPositionX = `${currRoadX}vw`;
 }
 
@@ -103,11 +134,19 @@ const createObstacles = () => {
   obstacleTimeOut = setTimeout(createObstacles, Math.round(Math.random() * (MAX_DELAY - MIN_DELAY) + MIN_DELAY));
 }
 
+const animateObstacles = () => {
+  obstacleArray = document.querySelectorAll(".obstacle");
+  obstacleArray.forEach((element) => {
+    obstacleX = Number(element.style.right.slice(0, -2));
+    obstacleX += ROAD_VELOCITY * deltaT;
+    element.style.right = `${obstacleX}vw`;
+  })
+};
 
 const pause = (event) => {
   console.log("pause");
-    document.removeEventListener("click", jump);
-    event.stopPropagation();
+  event.stopPropagation();
+  document.removeEventListener("click", jump);
     document.getElementById("pause").removeEventListener("click", pause);
     done = true;
     document.getElementById("pause-message").classList.remove("none");
@@ -137,4 +176,39 @@ function El(tagName, options = {}, ...children) {
       el.setAttribute(attributeName, options.attributes[attributeName]);
   }
   return el;
+}
+
+
+
+
+
+
+
+
+function animLoop( render ) {
+  var running, lastFrame = +new Date;
+  function loop( now ) {
+      // stop the loop if render returned false
+      if ( running !== false ) {
+          requestAnimationFrame( loop );
+          var elapsed1 = now - lastFrame;
+          // do not render frame when deltaT is too high
+          if ( elapsed1 < 160 ) {
+              running = render( elapsed1 );
+          }
+          lastFrame = now;
+      }
+  }
+  loop( lastFrame );
+}
+
+// Usage
+// optional 2nd arg: elem containing the animation
+// animLoop(moveLeft);
+
+const moveLeft = (deltaT) => {
+  elem.style.left = ( left += 10 * deltaT / 16 ) + "px";
+  if ( left > 400 ) {
+    return false;
+  }
 }
