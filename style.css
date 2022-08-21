@@ -37,6 +37,7 @@ body, html {
 body {
     background-image: url("assets/media/background.svg"), url("assets/media/background.svg");
     background-position: center top;
+    background-position-y: -10vh;
     background-size: 93% 100%;
     background-repeat: repeat-x;
     /* animation: bg-animation 2s infinite; */
@@ -65,7 +66,7 @@ body {
     background-repeat: repeat-x;
     /* transition: background-position 1s; */
     position: absolute;
-    bottom: 5vh;
+    bottom: 15vh;
     z-index: -1;
     
 }
@@ -74,7 +75,7 @@ body {
     height: 10vh;
     width: auto;
     position: absolute;
-    bottom: 11.5vh;
+    bottom: 21.5vh;
     left: 6vw;
     filter: brightness(1.5);
     /* animation: jump var(--jump-time) cubic-bezier(0.43, -0.01, 0.79, 1.13) infinite; */
@@ -88,7 +89,7 @@ body {
 
 .obstacle {
     position: absolute;
-    bottom: 11.5vh;
+    bottom: 21.5vh;
     right: 0vw;
     width: 3vw;
     transition: right 0.1s;
