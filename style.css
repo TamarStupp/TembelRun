@@ -287,7 +287,7 @@ body {
         top: calc(50% - 10vh);
         transform: translate(-50%, -50%);
         padding: 1vh 0 0.1vh;
-        font-size: 0.85em;
+        font-size: 0.75em;
     }
 
     .btn {

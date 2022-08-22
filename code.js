@@ -39,6 +39,7 @@ let highScores = [0, 0, 0, 0, 0];
 ------------------------------------------------------------------------------------------------------------------------------
 description:  */
 window.addEventListener("load", () => {
+  alert(window.innerHeight);
   document.getElementById("start").addEventListener("click", startGame);
   document.getElementById("start").addEventListener("click", fullScreen);
 });
