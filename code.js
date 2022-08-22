@@ -95,8 +95,7 @@ const startGame = (event) => {
 description:  */
 const fullScreen = () => {
   if (!document.webkitFullscreenElement && !document.webkitCurrentFullScreenElement) {
-    let is_safari = navigator.userAgent.toLowerCase().indexOf('safari/') > -1;
-    if (is_safari) {
+    if (document.documentElement.webkitEnterFullscreen) {
       document.documentElement.webkitEnterFullscreen();
     } else {
       document.documentElement.webkitRequestFullscreen();
