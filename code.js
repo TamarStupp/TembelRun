@@ -94,7 +94,6 @@ const startGame = (event) => {
 ------------------------------------------------------------------------------------------------------------------------------
 description:  */
 const fullScreen = () => {
-  alert(webkitSupportsFullscreen);
   if (!document.webkitFullscreenElement && !document.webkitCurrentFullScreenElement) {
     if (document.documentElement.webkitEnterFullscreen) {
       document.documentElement.webkitEnterFullscreen();
