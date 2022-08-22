@@ -10,6 +10,10 @@
         <script src="code.js"></script>
     </head>
     <body id="body">
+        <img id="full-screen-btn" class="full-screen-btn none" alt="עבור למסך מלא" src="assets/media/expand.svg"/>
+        <div id="portrait-error" class="black-screen none">
+            <div class="title text portrait-text">תהפכו את המסך לרוחב כדי להתחיל לשחק</div>
+        </div>
         <div id="start-message" class="black-screen">
             <div class="text" id="start-text">
                 <div class="title">ברוכים הבאים למשחק של טמבל!</div>
@@ -20,7 +24,7 @@
         </div>
         <img class="pause-btn" id="pause" src="assets/media/pause.svg" alt="pause button"/>
         <div id="road" class="road"></div>
-        <!-- <img id="tembel" src="assets/media/tembel.png" alt="cat"/> -->
+        <img id="tembel" src="assets/media/tembel.png" alt="cat"/>
         <div id="pause-message" class="black-screen none">
             <div class="text">
                 <div class="title">התעייפת?</div>
@@ -32,8 +36,22 @@
         <div id="end-message" class="black-screen none">
             <div class="end">
                 <div class="title">אוי לא! שריקית תפסה אתכם!</div>
+                <div class="open-text" id="end-score"></div>
                 <img src="assets/media/sadTembel.jpg" alt="טמבל עצוב" class="end-pic"/>
-                <div class="replay" id="replay">ניסיון נוסף</div>
+                <div>
+                    <img class="best-scores" id="best-scores" alt="גביע" src="assets/media/trophy.svg"/>
+                    <div class="replay btn" id="replay">רוצים לנסות שוב?</div>
+                </div>
+            </div>
+        </div>
+        <div id="click-area"></div>
+        <div id="score" class="score">ניקוד: </div>
+            <div id="show-scores" class="black-screen none">
+                <div class="text">
+                    <img id="X" class="X" alt="close" src="assets/media/X.svg">
+                    <div class="title">השיאים שלך:</div>
+                    <div id="score-list" class="open-text"></div>
+                </div>
             </div>
         </div>
     </body>

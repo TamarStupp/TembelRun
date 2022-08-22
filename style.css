@@ -37,7 +37,6 @@ body, html {
 body {
     background-image: url("assets/media/background.svg"), url("assets/media/background.svg");
     background-position: center top;
-    background-position-y: -10vh;
     background-size: 93% 100%;
     background-repeat: repeat-x;
     /* animation: bg-animation 2s infinite; */
@@ -52,10 +51,14 @@ body {
     height: 100vh;
     color: white;
     direction: rtl;
+    z-index: 2;
+    top: 0;
+    left: 0;
 }
 
 .none {
     display: none;
+    pointer-events: none;
 }
 
 .road {
@@ -66,7 +69,7 @@ body {
     background-repeat: repeat-x;
     /* transition: background-position 1s; */
     position: absolute;
-    bottom: 15vh;
+    bottom: 5vh;
     z-index: -1;
     
 }
@@ -75,7 +78,7 @@ body {
     height: 10vh;
     width: auto;
     position: absolute;
-    bottom: 21.5vh;
+    bottom: 11.5vh;
     left: 6vw;
     filter: brightness(1.5);
     /* animation: jump var(--jump-time) cubic-bezier(0.43, -0.01, 0.79, 1.13) infinite; */
@@ -89,7 +92,7 @@ body {
 
 .obstacle {
     position: absolute;
-    bottom: 21.5vh;
+    bottom: 11.5vh;
     right: 0vw;
     width: 3vw;
     transition: right 0.1s;
@@ -165,13 +168,9 @@ body {
     background-color: rgba(171, 171, 171, 0.582);
     border-radius: 50%;
     padding: 6vh 20vw;
+    pointer-events: none;
 }
 
-#end-message {
-    /* display: flex; */
-    flex-direction: column;
-    align-items: center;
-}
 
 .end-pic {
     width: 50%;
@@ -180,14 +179,7 @@ body {
 }
 
 .replay {
-    display: block;
-    margin: 3vh auto;
-    font-size: 2em;
-    background-color: #725326;
-    border-radius: 0.5em;
-    padding: 1vh 1vw;
-    color: white;
-    width: 50%;
+    width: 70%;
 }
 
 .end {
@@ -201,4 +193,83 @@ body {
     left: 50%;
     transform: translate(-50%, -50%);
     padding: 1vh 0 1vh; 
+}
+
+.full-screen-btn {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 3;
+    width: 3vw;
+    margin: 2vh 2vw;
+}
+
+#click-area {
+    width: 100vw;
+    height: 100vh;
+}
+
+.portrait-text {
+    padding: 10vh 3vh;
+}
+
+.score {
+    direction: rtl;
+    position: absolute;
+    top: 0;
+    left: 50%;
+    font-size: 1.7em;
+    color: white;
+}
+
+#end-score {
+    margin-bottom: 1vh;
+    margin-top: -2vh;
+}
+
+.bold {
+    font-weight: bold;
+    color: rgb(239 198 125);
+}
+
+.best-scores {
+    width: 5vw;
+    position: relative;
+    top: 2vh;
+    left: 1vh;
+}
+
+/* score screen */
+#score-list {
+    font-size: 2.5em;
+}
+
+.X {
+    text-align: center;
+    position: absolute;
+    top: 1vh;
+    right: 1vw;
+    font-size: 2em;
+    width: 7vw;
+}
+
+.golden-star {
+    height: 3vh;
+    display: inline-block;
+    margin-left: 2vw;
+}
+
+.score-text {
+    display: inline-block;
+}
+
+.score-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 45vw;
+    background-color: rgb(114 83 38);
+    border-radius: 1em;
+    padding: 0.2em 1em;
+    margin: 0.2em auto;
 }
