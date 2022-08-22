@@ -92,14 +92,14 @@ const startGame = (event) => {
 ------------------------------------------------------------------------------------------------------------------------------
 description:  */
 const fullScreen = () => {
-  if (!document.fullscreenElement) {
-    document.documentElement.requestFullscreen();
+  if (!document.webkitFullscreenElement) {
+    document.documentElement.webkitRequestFullscreen();
     document.getElementById("full-screen-btn").classList.remove("none");
     document.getElementById("full-screen-btn").addEventListener("click", fullScreen);
     document.getElementById("full-screen-btn").src = "assets/media/compress.svg";
-  } else if (document.exitFullscreen) {
+  } else if (document.webkitExitFullscreen) {
     document.getElementById("full-screen-btn").src = "assets/media/expand.svg";
-    document.exitFullscreen();
+    document.webkitExitFullscreen();
   }
 }
 
@@ -121,7 +121,8 @@ const jump = (event) => {
 /* pause
 ------------------------------------------------------------------------------------------------------------------------------
 description:  */
-const pause = (event) => {
+const pause = () => {
+  console.log("pause")
   visualViewport.removeEventListener("resize", checkOrientation);
   document.getElementById("tembel").removeEventListener("click", jump);
   document.getElementById("click-area").removeEventListener("click", jump);
