@@ -70,6 +70,8 @@ const startGame = (event) => {
   roadVelocity = INITIAL_ROAD_VELOCITY;
   done = false;
   score = 0;
+  currBackgroundX = 0;
+  currRoadX = 0;
   // resets obstacles
   document.querySelectorAll(".obstacle").forEach((el => {
     el.remove();
