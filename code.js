@@ -94,8 +94,13 @@ const startGame = (event) => {
 ------------------------------------------------------------------------------------------------------------------------------
 description:  */
 const fullScreen = () => {
-  if (!document.webkitFullscreenElement) {
-    document.documentElement.webkitRequestFullscreen();
+  if (!document.webkitFullscreenElement && !document.webkitCurrentFullScreenElement) {
+    let is_safari = navigator.userAgent.toLowerCase().indexOf('safari/') > -1;
+    if (is_safari) {
+      document.documentElement.webkitEnterFullscreen();
+    } else {
+      document.documentElement.webkitRequestFullscreen();
+    }
     document.getElementById("full-screen-btn").classList.remove("none");
     document.getElementById("full-screen-btn").addEventListener("click", fullScreen);
     document.getElementById("full-screen-btn").src = "assets/media/compress.svg";
