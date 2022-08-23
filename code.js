@@ -1,5 +1,5 @@
-const MIN_DELAY = 720;
-const MAX_DELAY = 1500;
+const MIN_DELAY = 1720;
+const MAX_DELAY = 2500;
 const BG_VELOCITY = 0.4 * 0.06 /* vw per ms */; 
 const INITIAL_ROAD_VELOCITY = 1.7 * 0.06;
 const SCORE_TO_CHANGE_VELOCITY = 150;
