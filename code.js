@@ -78,6 +78,7 @@ const startGame = (event) => {
   document.getElementById("tembel").classList.remove("none");
   document.getElementById("start-message").classList.add("none");
   document.getElementById("click-area").addEventListener("click", jump);
+    document.getElementById("replay").removeEventListener("click", startGame);
   checkOrientation();
     // pause the game when user changes tabs
     document.addEventListener("visibilitychange", event => {
@@ -92,12 +93,12 @@ const startGame = (event) => {
 ------------------------------------------------------------------------------------------------------------------------------
 description:  */
 const fullScreen = () => {
-  if (!document.fullscreenElement) {
-    document.documentElement.requestFullscreen();
+  if (!document.webkitFullscreenElement) {
+    document.documentElement.webkitRequestFullscreen();
     document.getElementById("full-screen-btn").classList.remove("none");
     document.getElementById("full-screen-btn").addEventListener("click", fullScreen);
     document.getElementById("full-screen-btn").src = "assets/media/compress.svg";
-  } else if (document.exitFullscreen) {
+  } else if (document.webkitExitFullscreen) {
     document.getElementById("full-screen-btn").src = "assets/media/expand.svg";
     document.exitFullscreen();
   }
