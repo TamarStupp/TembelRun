@@ -15,7 +15,7 @@ let roadVelocity = 1.7 * 0.06;
 let currBackgroundX = 0;
 let currRoadX = 0;
 
-// bstacle animation 
+// obstacle animation 
 let typesOfObstacles = ["tall-obstacle", "short-obstacle"];
 let obstacleTimeOut;
 
@@ -25,9 +25,8 @@ let newObstacle;
 let obstacleArray = [];
 let tembelClientRect;
 let obstacleClientRect;
-let collisions;
 let velocityMultiplier;
-let wrapper;
+let animationId;
 
 // general
 let pauseDelay;
@@ -39,59 +38,10 @@ let highScores = [0, 0, 0, 0, 0];
 ------------------------------------------------------------------------------------------------------------------------------
 description:  */
 window.addEventListener("load", () => {
+  document.getElementById("tembel").addEventListener("click", jump);
   document.getElementById("start").addEventListener("click", startGame);
   document.getElementById("start").addEventListener("click", fullScreen);
 });
-
-
-/* checkOrientation
-------------------------------------------------------------------------------------------------------------------------------
-description: happens before continueGame or when screen size change.
-make sure the view is landscape and not portrait */
-const checkOrientation = () => {
-  document.getElementById("pause-message").classList.add("none");
-  visualViewport.addEventListener("resize", checkOrientation);
-  console.log(window.innerHeight, window.innerWidth)
-  if (window.innerWidth < window.innerHeight) {
-    console.log("true");
-    document.getElementById("click-area").removeEventListener("click", jump);
-    document.getElementById("tembel").removeEventListener("click", jump);
-    document.getElementById("pause").removeEventListener("click", pause);
-    done = true;
-    clearTimeout(obstacleTimeOut);
-    document.getElementById("portrait-error").classList.remove("none");
-  } else {
-    continueGame();
-    document.getElementById("portrait-error").classList.add("none");
-  }
-}
-
-/* startGame
-------------------------------------------------------------------------------------------------------------------------------
-description:  */
-const startGame = (event) => {
-  roadVelocity = INITIAL_ROAD_VELOCITY;
-  done = false;
-  score = 0;
-  currBackgroundX = 0;
-  currRoadX = 0;
-  // resets obstacles
-  document.querySelectorAll(".obstacle").forEach((el => {
-    el.remove();
-  }));
-  document.getElementById("end-message").classList.add("none");
-  document.getElementById("tembel").classList.remove("none");
-  document.getElementById("start-message").classList.add("none");
-  document.getElementById("click-area").addEventListener("click", jump);
-  checkOrientation();
-    // pause the game when user changes tabs
-    document.addEventListener("visibilitychange", event => {
-      if (document.visibilityState !== "visible") {
-        let stop = new Event("click");
-        document.getElementById("pause").dispatchEvent(stop);
-      }
-    });
-}
 
 /* fullScreen
 ------------------------------------------------------------------------------------------------------------------------------
@@ -118,19 +68,76 @@ const fullScreen = () => {
   checkOrientation();
 }
 
-/* jump
+/* startGame
 ------------------------------------------------------------------------------------------------------------------------------
 description:  */
-const jump = (event) => {
-  let animationTime = 0.7 * 1000;
-  document.getElementById("click-area").removeEventListener("click", jump);
-  document.getElementById("tembel").removeEventListener("click", jump);
-  document.getElementById("tembel").classList.add("jump");
-  setTimeout(() => {
-    document.getElementById("click-area").addEventListener("click", jump);
-    document.getElementById("tembel").addEventListener("click", jump);
-    document.getElementById("tembel").classList.remove("jump");
-  }, animationTime);
+const startGame = (event) => {
+  // init variables
+  roadVelocity = INITIAL_ROAD_VELOCITY;
+  done = false;
+  score = 0;
+  currBackgroundX = 0;
+  currRoadX = 0;
+  document.getElementById("end-message").classList.add("none");
+  document.getElementById("tembel").classList.remove("none");
+  document.getElementById("start-message").classList.add("none");
+    // pause the game when user changes tabs
+    document.addEventListener("visibilitychange", event => {
+      if (document.visibilityState !== "visible") {
+        let stop = new Event("click");
+        document.getElementById("pause").dispatchEvent(stop);
+      }
+    });
+}
+
+/* checkOrientation
+------------------------------------------------------------------------------------------------------------------------------
+description: happens before continueGame or when screen size change.
+make sure the view is landscape and not portrait */
+const checkOrientation = () => {
+  document.getElementById("pause-message").classList.add("none");
+  visualViewport.addEventListener("resize", checkOrientation);
+  console.log(window.innerHeight, window.innerWidth)
+  if (window.innerWidth < window.innerHeight) {
+    console.log("true");
+    document.getElementById("click-area").removeEventListener("click", jump);
+    document.getElementById("tembel").removeEventListener("click", jump);
+    document.getElementById("pause").removeEventListener("click", pause);
+    done = true;
+    clearTimeout(obstacleTimeOut);
+    document.getElementById("portrait-error").classList.remove("none");
+  } else {
+    continueGame();
+    document.getElementById("portrait-error").classList.add("none");
+  }
+}
+
+/* continueGame
+------------------------------------------------------------------------------------------------------------------------------
+description:  */
+const continueGame = () => {
+  document.getElementById("click-area").addEventListener("click", jump);
+  document.getElementById("timer").innerText = `3`;
+  document.getElementById("timer").classList.remove("none");
+  setTimeout(delayCounter, 1000, 2);
+}
+
+/* delayCounter
+------------------------------------------------------------------------------------------------------------------------------
+description:  */
+const delayCounter = (secondsLeft) => {
+if (secondsLeft === 0) {
+  document.getElementById("timer").classList.add("none");
+  window.requestAnimationFrame(handleAnimations);
+  obstacleTimeOut = setTimeout(createObstacles, Math.round(Math.random() * (MAX_DELAY - MIN_DELAY) + MIN_DELAY));
+  done = false;
+  document.getElementById("pause").addEventListener("click", pause);
+  scoreInterval = setInterval(scoreUpdate, 100);
+} else {
+  document.getElementById("timer").innerText = `${secondsLeft}`;
+  secondsLeft--;
+  setTimeout(delayCounter, 1000, secondsLeft);
+}
 }
 
 /* pause
@@ -146,46 +153,21 @@ const pause = () => {
   document.getElementById("pause-message").classList.remove("none");
   document.getElementById("resume").addEventListener("click", checkOrientation);
   document.getElementById("quit").addEventListener("click", endGame);
-}
-
-/* continueGame
-------------------------------------------------------------------------------------------------------------------------------
-description:  */
-const continueGame = () => {
-    document.getElementById("click-area").addEventListener("click", jump);
-    document.getElementById("tembel").addEventListener("click", jump);
-    document.getElementById("timer").innerText = `3`;
-    document.getElementById("timer").classList.remove("none");
-    setTimeout(delayCounter, 1000, 2);
-}
-
-/* delayCounter
-------------------------------------------------------------------------------------------------------------------------------
-description:  */
-const delayCounter = (secondsLeft) => {
-  if (secondsLeft === 0) {
-    document.getElementById("timer").classList.add("none");
-    window.requestAnimationFrame(handleAnimations);
-    obstacleTimeOut = setTimeout(createObstacles, Math.round(Math.random() * (MAX_DELAY - MIN_DELAY) + MIN_DELAY));
-    done = false;
-    document.getElementById("pause").addEventListener("click", pause);
-    scoreInterval = setInterval(scoreUpdate, 100);
-  } else {
-    document.getElementById("timer").innerText = `${secondsLeft}`;
-    secondsLeft--;
-    setTimeout(delayCounter, 1000, secondsLeft);
-  }
 } 
 
-/* scoreUpdate
+/* jump
 ------------------------------------------------------------------------------------------------------------------------------
 description:  */
-const scoreUpdate = () => {
-  score++;
-  document.getElementById("score").innerText = `ניקוד: ${score}`;
-  velocityMultiplier = Math.floor(score/SCORE_TO_CHANGE_VELOCITY) * 0.125 + 1;
-  roadVelocity = INITIAL_ROAD_VELOCITY * velocityMultiplier;
-  console.log(roadVelocity, velocityMultiplier);
+const jump = (event) => {
+  let animationTime = 0.7 * 1000;
+  document.getElementById("click-area").removeEventListener("click", jump);
+  document.getElementById("tembel").removeEventListener("click", jump);
+  document.getElementById("tembel").classList.add("jump");
+  setTimeout(() => {
+    document.getElementById("click-area").addEventListener("click", jump);
+    document.getElementById("tembel").addEventListener("click", jump);
+    document.getElementById("tembel").classList.remove("jump");
+  }, animationTime);
 }
 
 /* handleAnimations
@@ -193,18 +175,24 @@ const scoreUpdate = () => {
 description:  */
 const handleAnimations = (timestamp) => {
   if(!done) {
-    window.requestAnimationFrame(handleAnimations);
     deltaT = timestamp - previousTimeStamp;
     if (deltaT < 160) {
       animateBackground();
       animateObstacles()
       checkCollision();
     }
+    animationId = window.requestAnimationFrame(handleAnimations);
+    previousTimeStamp = timestamp;
   } else {
+    window.cancelAnimationFrame(animationId);
     clearTimeout(obstacleTimeOut);
     clearInterval(scoreInterval);
+      // delete obstacles
+    document.querySelectorAll(".obstacle").forEach((el => {
+      el.remove();
+    }));
+    console.log("clean");
   }
-  previousTimeStamp = timestamp;
 }
 
 /* animateBackground, createObstacles, animateObstacles
@@ -237,6 +225,17 @@ const animateObstacles = () => {
       element.style.right = `${obstacleX}vw`;
     });
 };
+
+/* scoreUpdate
+------------------------------------------------------------------------------------------------------------------------------
+description:  */
+const scoreUpdate = () => {
+  score++;
+  document.getElementById("score").innerText = `ניקוד: ${score}`;
+  velocityMultiplier = Math.floor(score/SCORE_TO_CHANGE_VELOCITY) * 0.125 + 1;
+  roadVelocity = INITIAL_ROAD_VELOCITY * velocityMultiplier;
+  console.log(roadVelocity, velocityMultiplier);
+}
 
 /* checkCollision
 ------------------------------------------------------------------------------------------------------------------------------
@@ -275,7 +274,11 @@ const endGame = () => {
   document.getElementById("end-score").innerHTML = score > highScores[0] ? `<span class="bold">שיא חדש!</span> צברתם ${score} נקודות` :`צברתם ${score} נקודות`;
   document.getElementById("end-message").classList.remove("none");
   document.getElementById("tembel").classList.add("none");
-  document.getElementById("replay").addEventListener("click", startGame);
+  document.getElementById("click-area").removeEventListener("click", jump);
+  document.getElementById("replay").addEventListener("click", () => {
+    startGame(); 
+    checkOrientation();
+  });
   document.getElementById("best-scores").addEventListener("click", showScores);
   // update high scores
   if (score > highScores[4]) {
@@ -283,6 +286,7 @@ const endGame = () => {
     highScores.sort((a, b) => {return(b-a)});
   }
   document.getElementById("score-list").innerHTML = "";
+  let wrapper;
   highScores.forEach((item, index) => {
     wrapper = El("div", {cls: "score-wrap"} ,
     El("img", {attributes: {"src":"assets/media/goldenStar.svg", alt:"כוכב", class: "golden-star"}}), 
@@ -291,10 +295,10 @@ const endGame = () => {
   });
 }
 
-
 const showScores = () => {
   document.getElementById("show-scores").classList.remove("none");
   document.getElementById("end-message").classList.add("none");
+  // close high scores
   document.getElementById('X').addEventListener("click", () => {    
     document.getElementById("show-scores").classList.add("none");
     document.getElementById("end-message").classList.remove("none");
