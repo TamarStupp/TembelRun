@@ -51,11 +51,14 @@ make sure the view is landscape and not portrait */
 const checkOrientation = () => {
   document.getElementById("pause-message").classList.add("none");
   visualViewport.addEventListener("resize", checkOrientation);
+  console.log(window.innerHeight, window.innerWidth)
   if (window.innerWidth < window.innerHeight) {
+    console.log("true");
     document.getElementById("click-area").removeEventListener("click", jump);
     document.getElementById("tembel").removeEventListener("click", jump);
     document.getElementById("pause").removeEventListener("click", pause);
     done = true;
+    clearTimeout(obstacleTimeOut);
     document.getElementById("portrait-error").classList.remove("none");
   } else {
     continueGame();
@@ -94,6 +97,11 @@ const startGame = (event) => {
 ------------------------------------------------------------------------------------------------------------------------------
 description:  */
 const fullScreen = () => {
+  document.getElementById("click-area").removeEventListener("click", jump);
+  document.getElementById("tembel").removeEventListener("click", jump);
+  document.getElementById("pause").removeEventListener("click", pause);
+  done = true;
+  document.getElementById("portrait-error").classList.remove("none");
   if (!document.webkitFullscreenElement && !document.webkitCurrentFullScreenElement) {
     if (document.documentElement.webkitEnterFullscreen) {
       document.documentElement.webkitEnterFullscreen();
@@ -107,6 +115,7 @@ const fullScreen = () => {
     document.getElementById("full-screen-btn").src = "assets/media/expand.svg";
     document.webkitExitFullscreen();
   }
+  checkOrientation();
 }
 
 /* jump
@@ -260,6 +269,7 @@ description:  */
 const endGame = () => {
   visualViewport.removeEventListener("resize", checkOrientation);
   document.getElementById("pause").removeEventListener("click", pause);
+  document.getElementById("pause-message").classList.add("none");
   done = true;
   document.getElementById("score").innerText = "ניקוד";
   document.getElementById("end-score").innerHTML = score > highScores[0] ? `<span class="bold">שיא חדש!</span> צברתם ${score} נקודות` :`צברתם ${score} נקודות`;
