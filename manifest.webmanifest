@@ -14,5 +14,5 @@
     "display": "fullscreen",
     "background_color": "silver",
     "orientation": "landscape",
-    "start_url": "/"
+    "start_url": "index.html"
 }
