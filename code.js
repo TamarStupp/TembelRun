@@ -40,8 +40,8 @@ let continueTimer;
 ------------------------------------------------------------------------------------------------------------------------------
 description:  */
 window.addEventListener("load", () => {
-  MAX_DELAY = window.innerWidth/INITIAL_ROAD_VELOCITY * 0.25;
-  MIN_DELAY = window.innerWidth/INITIAL_ROAD_VELOCITY * 0.1;
+  MAX_DELAY = window.innerWidth/INITIAL_ROAD_VELOCITY * 0.35;
+  MIN_DELAY = window.innerWidth/INITIAL_ROAD_VELOCITY * 0.15;
   document.getElementById("start").addEventListener("click", startGame);
   document.getElementById("start").addEventListener("click", fullScreen);
   // Will be activated when full screen icon is shown
