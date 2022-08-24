@@ -1,0 +1,18 @@
+{
+    "icons": [
+        {
+            "src": "assets/icons/icon.svg",
+            "sizes": "any",
+            "type": "image/svg"
+        }
+    ],
+    "dir": "rtl",
+    "lang": "he",
+    "name": "טמבל-ראן",
+    "short_name": "טמבל",
+    "description": "טמבל קופץ! יאי!",
+    "display": "fullscreen",
+    "background_color": "silver",
+    "orientation": "landscape",
+    "start_url": "../index.html"
+}
