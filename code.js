@@ -1,11 +1,10 @@
-const MIN_DELAY = 1720;
-const MAX_DELAY = 2500;
+let MIN_DELAY;
+let MAX_DELAY;
 const BG_VELOCITY = 0.4 * 0.06 /* vw per ms */; 
 const INITIAL_ROAD_VELOCITY = 1.7 * 0.06;
 const SCORE_TO_CHANGE_VELOCITY = 150;
 
 // genertal  animation
-let stopAnimations = false;
 let deltaT;
 let previousTimeStamp;
 let done = false;
@@ -15,7 +14,7 @@ let roadVelocity = 1.7 * 0.06;
 let currBackgroundX = 0;
 let currRoadX = 0;
 
-// bstacle animation 
+// obstacle animation 
 let typesOfObstacles = ["tall-obstacle", "short-obstacle"];
 let obstacleTimeOut;
 
@@ -34,13 +33,19 @@ let pauseDelay;
 let score = 0;
 let scoreInterval;
 let highScores = [0, 0, 0, 0, 0];
+let continueTimer;
+
 
 /* load function
 ------------------------------------------------------------------------------------------------------------------------------
 description:  */
 window.addEventListener("load", () => {
+  MAX_DELAY = window.innerWidth/INITIAL_ROAD_VELOCITY * 0.25;
+  MIN_DELAY = window.innerWidth/INITIAL_ROAD_VELOCITY * 0.1;
   document.getElementById("start").addEventListener("click", startGame);
   document.getElementById("start").addEventListener("click", fullScreen);
+  // Will be activated when full screen icon is shown
+  document.getElementById("full-screen-btn").addEventListener("click", fullScreen);
 });
 
 
@@ -49,6 +54,7 @@ window.addEventListener("load", () => {
 description: happens before continueGame or when screen size change.
 make sure the view is landscape and not portrait */
 const checkOrientation = () => {
+  clearTimeout(continueTimer);
   document.getElementById("pause-message").classList.add("none");
   visualViewport.addEventListener("resize", checkOrientation);
   if (window.innerWidth < window.innerHeight) {
@@ -57,6 +63,7 @@ const checkOrientation = () => {
     document.getElementById("pause").removeEventListener("click", pause);
     done = true;
     document.getElementById("portrait-error").classList.remove("none");
+    document.getElementById("full-screen-btn").classList.remove("none");
   } else {
     continueGame();
     document.getElementById("portrait-error").classList.add("none");
@@ -70,6 +77,9 @@ const startGame = (event) => {
   roadVelocity = INITIAL_ROAD_VELOCITY;
   done = false;
   score = 0;
+  currBackgroundX = 0;
+  currRoadX = 0;
+  previousTimeStamp = undefined;
   // resets obstacles
   document.querySelectorAll(".obstacle").forEach((el => {
     el.remove();
@@ -78,7 +88,7 @@ const startGame = (event) => {
   document.getElementById("tembel").classList.remove("none");
   document.getElementById("start-message").classList.add("none");
   document.getElementById("click-area").addEventListener("click", jump);
-    document.getElementById("replay").removeEventListener("click", startGame);
+  document.getElementById("replay").removeEventListener("click", startGame);
   checkOrientation();
     // pause the game when user changes tabs
     document.addEventListener("visibilitychange", event => {
@@ -95,8 +105,6 @@ description:  */
 const fullScreen = () => {
   if (!document.webkitFullscreenElement) {
     document.documentElement.webkitRequestFullscreen();
-    document.getElementById("full-screen-btn").classList.remove("none");
-    document.getElementById("full-screen-btn").addEventListener("click", fullScreen);
     document.getElementById("full-screen-btn").src = "assets/media/compress.svg";
   } else if (document.webkitExitFullscreen) {
     document.getElementById("full-screen-btn").src = "assets/media/expand.svg";
@@ -123,6 +131,7 @@ const jump = (event) => {
 ------------------------------------------------------------------------------------------------------------------------------
 description:  */
 const pause = (event) => {
+  document.getElementById("full-screen-btn").classList.remove("none");
   visualViewport.removeEventListener("resize", checkOrientation);
   document.getElementById("tembel").removeEventListener("click", jump);
   document.getElementById("click-area").removeEventListener("click", jump);
@@ -137,11 +146,12 @@ const pause = (event) => {
 ------------------------------------------------------------------------------------------------------------------------------
 description:  */
 const continueGame = () => {
+  document.getElementById("full-screen-btn").classList.add("none");
     document.getElementById("click-area").addEventListener("click", jump);
     document.getElementById("tembel").addEventListener("click", jump);
     document.getElementById("timer").innerText = `3`;
     document.getElementById("timer").classList.remove("none");
-    setTimeout(delayCounter, 1000, 2);
+    continueTimer = setTimeout(delayCounter, 1000, 2);
 }
 
 /* delayCounter
@@ -158,7 +168,7 @@ const delayCounter = (secondsLeft) => {
   } else {
     document.getElementById("timer").innerText = `${secondsLeft}`;
     secondsLeft--;
-    setTimeout(delayCounter, 1000, secondsLeft);
+    continueTimer = setTimeout(delayCounter, 1000, secondsLeft);
   }
 } 
 
@@ -170,13 +180,15 @@ const scoreUpdate = () => {
   document.getElementById("score").innerText = `ניקוד: ${score}`;
   velocityMultiplier = Math.floor(score/SCORE_TO_CHANGE_VELOCITY) * 0.125 + 1;
   roadVelocity = INITIAL_ROAD_VELOCITY * velocityMultiplier;
-  console.log(roadVelocity, velocityMultiplier);
 }
 
 /* handleAnimations
 ------------------------------------------------------------------------------------------------------------------------------
 description:  */
 const handleAnimations = (timestamp) => {
+  if (previousTimeStamp === undefined) {
+    previousTimeStamp = timestamp;
+  }
   if(!done) {
     window.requestAnimationFrame(handleAnimations);
     deltaT = timestamp - previousTimeStamp;
@@ -252,6 +264,7 @@ const checkCollision = () => {
 ------------------------------------------------------------------------------------------------------------------------------
 description:  */
 const endGame = () => {
+  document.getElementById("full-screen-btn").classList.remove("none");
   visualViewport.removeEventListener("resize", checkOrientation);
   document.getElementById("pause").removeEventListener("click", pause);
   done = true;
@@ -275,7 +288,9 @@ const endGame = () => {
   });
 }
 
-
+/* showScores
+------------------------------------------------------------------------------------------------------------------------------
+description:  */
 const showScores = () => {
   document.getElementById("show-scores").classList.remove("none");
   document.getElementById("end-message").classList.add("none");
