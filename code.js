@@ -49,8 +49,46 @@ window.addEventListener("load", () => {
   document.getElementById("start").addEventListener("click", fullScreen);
   // Will be activated when full screen icon is shown
   document.getElementById("full-screen-btn").addEventListener("click", fullScreen);
+  window.addEventListener('beforeinstallprompt', addToHome);
 });
 
+const addToHome = (e) => {
+  let deferredPrompt;
+  let addBtn = document.getElementById("add-to-home");
+  pause();
+  document.getElementById("body").style.pointerEvents = "none";
+  document.getElementById("add-to-home-msg").style.pointerEvents = "all";
+  // The user agrees to create shortcut
+  // Prevent Chrome 67 and earlier from automatically showing the prompt
+  e.preventDefault();
+  // Stash the event so it can be triggered later.
+  deferredPrompt = e;
+  // Update UI to notify the user they can add to home screen
+  document.getElementById("add-to-home-msg").classList.remove("none");
+  addBtn.addEventListener('click', (e) => {
+  // hide our user interface that shows our A2HS button
+  document.getElementById("add-to-home-msg").classList.add('none');
+  document.getElementById("body").style.pointerEvents = "all";
+    // Show the prompt
+    deferredPrompt.prompt();
+    // Wait for the user to respond to the prompt
+    deferredPrompt.userChoice.then((choiceResult) => {
+        if (choiceResult.outcome === 'accepted') {
+          console.log('User accepted the A2HS prompt');
+        } else {
+          checkOrientation();
+        }
+        deferredPrompt = null;
+      });
+   });
+
+   // When the user presses X
+   document.getElementById("close-msg").addEventListener("click", () => {
+    document.getElementById("add-to-home-msg").classList.add('none');
+    document.getElementById("body").style.pointerEvents = "all";
+    checkOrientation();
+   })
+}
 
 /* checkOrientation
 ------------------------------------------------------------------------------------------------------------------------------
