@@ -35,6 +35,9 @@ let scoreInterval;
 let highScores = [0, 0, 0, 0, 0];
 let continueTimer;
 
+// PWA (progressive web app)
+let deferredPrompt;
+
 
 /* load function
 ------------------------------------------------------------------------------------------------------------------------------
