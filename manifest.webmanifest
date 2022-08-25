@@ -1,11 +1,15 @@
 {
     "icons": [
         {
-            "src": "assets/icons/icon.svg",
-            "sizes": "any",
-            "type": "image/svg"
+            "src": "assets/icons/tembel.png",
+            "sizes": "144x144 256x256"
+        },
+        {
+          "src": "assets/icons/icon.svg",
+          "sizes": "any",
+          "type": "image/svg"
         }
-    ],
+      ],
     "dir": "rtl",
     "lang": "he",
     "name": "טמבל-ראן",

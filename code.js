@@ -39,6 +39,12 @@ let continueTimer;
 let deferredPrompt;
 
 
+/* register service worker - outside of load function*/
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('serviceWorker.js');
+}
+
+
 /* load function
 ------------------------------------------------------------------------------------------------------------------------------
 description:  */
@@ -55,7 +61,6 @@ window.addEventListener("load", () => {
 const addToHome = (e) => {
   let deferredPrompt;
   let addBtn = document.getElementById("add-to-home");
-  pause();
   document.getElementById("body").style.pointerEvents = "none";
   document.getElementById("add-to-home-msg").style.pointerEvents = "all";
   // The user agrees to create shortcut
@@ -187,6 +192,7 @@ const pause = (event) => {
 ------------------------------------------------------------------------------------------------------------------------------
 description:  */
 const continueGame = () => {
+  window.removeEventListener('beforeinstallprompt', addToHome);
   document.getElementById("full-screen-btn").classList.add("none");
     document.getElementById("click-area").addEventListener("click", jump);
     document.getElementById("tembel").addEventListener("click", jump);
@@ -305,6 +311,7 @@ const checkCollision = () => {
 ------------------------------------------------------------------------------------------------------------------------------
 description:  */
 const endGame = () => {
+  window.addEventListener('beforeinstallprompt', addToHome);
   document.getElementById("full-screen-btn").classList.remove("none");
   visualViewport.removeEventListener("resize", checkOrientation);
   document.getElementById("pause").removeEventListener("click", pause);
