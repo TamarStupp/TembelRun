@@ -50,22 +50,11 @@ if ('serviceWorker' in navigator) {
 /* load function
 ------------------------------------------------------------------------------------------------------------------------------
 description:  */
-window.addEventListener("load", () => {
+window.addEventListener("load", () => { 
+  window.addEventListener('beforeinstallprompt', addToHome);
   MAX_DELAY = window.innerWidth/INITIAL_ROAD_VELOCITY * 0.35;
   MIN_DELAY = window.innerWidth/INITIAL_ROAD_VELOCITY * 0.15;
   addListeners();
-  // count visits
-  let visitCount = localStorage.getItem('visitCount');
-  console.log(visitCount);
-  if (visitCount === null) {
-    localStorage.setItem("visitCount", 1);
-  } else {
-    visitCount++;
-    localStorage.setItem("visitCount", visitCount);
-    setTimeout (() => {
-      window.addEventListener('beforeinstallprompt', addToHome);
-    }, 1000);
-  }
   // restore high scores
   highScores = [];
   let savedHighScores = JSON.parse(localStorage.getItem(`highScores`) ?? "[0,0,0,0,0]");
@@ -74,10 +63,11 @@ window.addEventListener("load", () => {
   })
 });
 
-/* enable PWA
+/* addToHome
 ------------------------------------------------------------------------------------------------------------------------------
-description:  */
+description: enable PWA */
 const addToHome = (e) => {
+  console.log("add to home");
   let deferredPrompt;
   let addBtn = document.getElementById("add-to-home");
   document.getElementById("body").style.pointerEvents = "none";
@@ -87,28 +77,43 @@ const addToHome = (e) => {
   e.preventDefault();
   // Stash the event so it can be triggered later.
   deferredPrompt = e;
-  // Update UI to notify the user they can add to home screen
-  document.getElementById("add-to-home-msg").classList.remove("none");
-  addBtn.addEventListener('click', (e) => {
-  // hide our user interface that shows our A2HS button
-  document.getElementById("add-to-home-msg").classList.add('none');
-  document.getElementById("body").style.pointerEvents = "all";
-    // Show the prompt
-    deferredPrompt.prompt();
-    // Wait for the user to respond to the prompt
-    deferredPrompt.userChoice.then((choiceResult) => {
-        if (choiceResult.outcome === 'accepted') {
-          console.log('User accepted the A2HS prompt');
-        }
-        deferredPrompt = null;
-      });
-   });
-   // When the user presses X
-   document.getElementById("close-msg").addEventListener("click", () => {
-    document.getElementById("add-to-home-msg").classList.add('none');
-    document.getElementById("body").style.pointerEvents = "all";
-    checkOrientation();
-   })
+  // count visits and Update UI to notify the user they can add to home screen
+  let visitCount = localStorage.getItem('visitCount');
+  if (visitCount === null) {
+    localStorage.setItem("visitCount", 1);
+  } else {
+    visitCount++;
+    console.log(visitCount);
+    localStorage.setItem("visitCount", visitCount);
+    setTimeout (() => {
+      document.getElementById("add-to-home-msg").classList.remove("none");
+      document.getElementById("add-to-home-msg").classList.add('pop-up');
+      addBtn.addEventListener('click', (e) => {
+      // hide our user interface that shows our A2HS button
+      document.getElementById("add-to-home-msg").classList.add('none');
+      document.getElementById("body").style.pointerEvents = "all";
+        // Show the prompt
+        deferredPrompt.prompt();
+        // Wait for the user to respond to the prompt
+        deferredPrompt.userChoice.then((choiceResult) => {
+            if (choiceResult.outcome === 'accepted') {
+              console.log('User accepted the A2HS prompt');
+            }
+            deferredPrompt = null;
+          });
+       });
+      // When the user presses X
+      document.getElementById("close-msg").addEventListener("click", () => {
+      document.getElementById("add-to-home-msg").classList.remove('pop-up');
+      document.getElementById("add-to-home-msg").classList.add('reverse-pop-up');
+      document.getElementById("add-to-home-msg").addEventListener("animationend", () => {
+        document.getElementById("add-to-home-msg").classList.add('none');
+        document.getElementById("body").style.pointerEvents = "all";
+      })
+       });
+    }, 1000);
+  }
+
 }
 
 /* addListeners

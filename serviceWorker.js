@@ -1,4 +1,4 @@
-const cacheName = "tembelRun-v2.1";
+const cacheName = "tembelRun-v2.2";
 const contentToCache = [
     "code.js",
     "index.html",
