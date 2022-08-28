@@ -32,15 +32,17 @@ let wrapper;
 let pauseDelay;
 let score = 0;
 let scoreInterval;
-let highScores = [0, 0, 0, 0, 0];
+let highScores;
 let continueTimer;
+let isDead;
 
 // PWA (progressive web app)
 let deferredPrompt;
 
-
-/* register service worker - outside of load function*/
+/* handle service workers - outside of load function*/
 if ('serviceWorker' in navigator) {
+  /* remove previously registeres service workers */
+  // navigator.serviceWorker.getRegistrations().then( function(registrations) { for(let registration of registrations) { registration.unregister(); } }); 
   navigator.serviceWorker.register('serviceWorker.js');
 }
 
@@ -51,13 +53,30 @@ description:  */
 window.addEventListener("load", () => {
   MAX_DELAY = window.innerWidth/INITIAL_ROAD_VELOCITY * 0.35;
   MIN_DELAY = window.innerWidth/INITIAL_ROAD_VELOCITY * 0.15;
-  document.getElementById("start").addEventListener("click", startGame);
-  document.getElementById("start").addEventListener("click", fullScreen);
-  // Will be activated when full screen icon is shown
-  document.getElementById("full-screen-btn").addEventListener("click", fullScreen);
-  window.addEventListener('beforeinstallprompt', addToHome);
+  addListeners();
+  // count visits
+  let visitCount = localStorage.getItem('visitCount');
+  console.log(visitCount);
+  if (visitCount === null) {
+    localStorage.setItem("visitCount", 1);
+  } else {
+    visitCount++;
+    localStorage.setItem("visitCount", visitCount);
+    setTimeout (() => {
+      window.addEventListener('beforeinstallprompt', addToHome);
+    }, 1000);
+  }
+  // restore high scores
+  highScores = [];
+  let savedHighScores = JSON.parse(localStorage.getItem(`highScores`) ?? "[0,0,0,0,0]");
+  savedHighScores.forEach((item, index) => {
+    highScores[index] = item;
+  })
 });
 
+/* enable PWA
+------------------------------------------------------------------------------------------------------------------------------
+description:  */
 const addToHome = (e) => {
   let deferredPrompt;
   let addBtn = document.getElementById("add-to-home");
@@ -84,13 +103,29 @@ const addToHome = (e) => {
         deferredPrompt = null;
       });
    });
-
    // When the user presses X
    document.getElementById("close-msg").addEventListener("click", () => {
     document.getElementById("add-to-home-msg").classList.add('none');
     document.getElementById("body").style.pointerEvents = "all";
     checkOrientation();
    })
+}
+
+/* addListeners
+------------------------------------------------------------------------------------------------------------------------------
+description:  */
+const addListeners = () => {
+  // start listeners
+  document.getElementById("start").addEventListener("click", startGame);
+  document.getElementById("start").addEventListener("click", fullScreen);
+  // Will be activated when full screen icon is shown
+  document.getElementById("full-screen-btn").addEventListener("click", fullScreen);
+  // Pause screen listeners
+  document.getElementById("resume").addEventListener("click", checkOrientation);
+  document.getElementById("quit").addEventListener("click", endGame);
+  // End-screen listeners
+  document.getElementById("replay").addEventListener("click", startGame);
+  document.getElementById("best-scores").addEventListener("click", showScores);
 }
 
 /* checkOrientation
@@ -182,8 +217,6 @@ const pause = (event) => {
   document.getElementById("pause").removeEventListener("click", pause);
   done = true;
   document.getElementById("pause-message").classList.remove("none");
-  document.getElementById("resume").addEventListener("click", checkOrientation);
-  document.getElementById("quit").addEventListener("click", endGame);
 }
 
 /* continueGame
@@ -285,8 +318,8 @@ const animateObstacles = () => {
 description:  */
 const checkCollision = () => {
   tembelClientRect = document.getElementById("tembel").getBoundingClientRect();
-  document.querySelectorAll(".obstacle").forEach((elem, index) => {
-    obstacleClientRect = elem.getBoundingClientRect();
+  for (let index = 0; index < obstacleArray.length; index++) {
+    obstacleClientRect = obstacleArray[index].getBoundingClientRect();
     if (tembelClientRect.x < obstacleClientRect.x + obstacleClientRect.width &&
       tembelClientRect.x + tembelClientRect.width > obstacleClientRect.x &&
       tembelClientRect.y < obstacleClientRect.y + obstacleClientRect.height &&
@@ -297,41 +330,48 @@ const checkCollision = () => {
             tembelClientRect.x + tembelClientRect.width > obstacleClientRect.x &&
             tembelClientRect.y < obstacleClientRect.y + obstacleClientRect.height &&
             tembelClientRect.height + tembelClientRect.y > obstacleClientRect.y) {
-              endGame();
+              isDead = true;
               return;
           }
-      }, 13)
+      }, 17);
+      endGame();
+      break;
     }
-  });
+  };
 }
 
 /* endGame
 ------------------------------------------------------------------------------------------------------------------------------
 description:  */
 const endGame = () => {
+  isDead = false;
   window.addEventListener('beforeinstallprompt', addToHome);
   document.getElementById("full-screen-btn").classList.remove("none");
   visualViewport.removeEventListener("resize", checkOrientation);
   document.getElementById("pause").removeEventListener("click", pause);
+  document.getElementById("pause-message").classList.add("none");
   done = true;
   document.getElementById("score").innerText = "ניקוד";
   document.getElementById("end-score").innerHTML = score > highScores[0] ? `<span class="bold">שיא חדש!</span> צברתם ${score} נקודות` :`צברתם ${score} נקודות`;
   document.getElementById("end-message").classList.remove("none");
   document.getElementById("tembel").classList.add("none");
-  document.getElementById("replay").addEventListener("click", startGame);
-  document.getElementById("best-scores").addEventListener("click", showScores);
+    document.getElementById("replay").addEventListener("click", startGame);
   // update high scores
   if (score > highScores[4]) {
+    console.log("adding new high score to the list");
     highScores[4] = score;
     highScores.sort((a, b) => {return(b-a)});
   }
   document.getElementById("score-list").innerHTML = "";
   highScores.forEach((item, index) => {
+    // add to show scores screen
     wrapper = El("div", {cls: "score-wrap"} ,
     El("img", {attributes: {"src":"assets/media/goldenStar.svg", alt:"כוכב", class: "golden-star"}}), 
     El("div", {cls: "score-text"} ,`  ${item}`));
     document.getElementById("score-list").appendChild(wrapper);
   });
+  // add to localStorage
+  localStorage.setItem(`highScores`, JSON.stringify(highScores));
 }
 
 /* showScores

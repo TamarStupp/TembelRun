@@ -15,7 +15,7 @@
     "name": "טמבל-ראן",
     "short_name": "טמבל",
     "description": "טמבל קופץ! יאי!",
-    "display": "fullscreen",
+    "display": "standalone",
     "background_color": "silver",
     "orientation": "landscape",
     "start_url": "index.html"
