@@ -23,10 +23,6 @@ self.addEventListener('install', (e) => {
     e.waitUntil((async () => {
         const cache = await caches.open(cacheName);
         console.log('[Service Worker] Caching all: app shell and content');
-        // for (let item in contentToCache) {
-        //     console.log(contentToCache[item])
-        //     await cache.add(contentToCache[item]);
-        // }
         await cache.addAll(contentToCache);
       })());
   });
@@ -44,12 +40,12 @@ self.addEventListener('fetch', (e) => {
   })());
 });
 
-// What is this function doing?
-// self.addEventListener('activate', (e) => {
-//     e.waitUntil(caches.keys().then((keyList) => {
-//       return Promise.all(keyList.map((key) => {
-//         if (key === cacheName) { return; }
-//         return caches.delete(key);
-//       }))
-//     }));
-//   });
+// delete all the caches that are not updated (do not match the current version)
+self.addEventListener('activate', (e) => {
+    e.waitUntil(caches.keys().then((keyList) => {
+            return Promise.all(keyList.map((key) => {
+                    if (key === cacheName) { return; }
+                    return caches.delete(key);
+            }))
+    }));
+});
